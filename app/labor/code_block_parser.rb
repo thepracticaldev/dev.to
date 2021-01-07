@@ -63,10 +63,10 @@ module CodeBlockParser
     doc = Nokogiri::HTML.fragment(html)
     doc.search("div.highlight__panel").each do |codeblock|
       fullscreen_action = <<~HTML
-        <div class="highlight__panel-action js-fullscreen-code-action">
+        <button class="highlight__panel-action js-fullscreen-code-action">
             #{icon_fullscreen_on}
             #{icon_fullscreen_off}
-        </div>
+        </button>
       HTML
 
       codeblock.add_child(fullscreen_action)

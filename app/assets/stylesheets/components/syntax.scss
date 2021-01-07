@@ -23,10 +23,16 @@ blockquote pre.highlight {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   overflow-wrap: initial;
+  border: 2px solid var(--syntax-background-color);
+  outline: none;
 
   code {
     font-size: 100%;
     padding: 0;
+  }
+
+  &:focus-within {
+    border: 2px solid var(--accent-brand);
   }
 }
 
@@ -50,11 +56,18 @@ div.highlight {
   top: 0;
   right: 0;
   display: flex;
-  visibility: hidden;
+  opacity: 0;
+  background: none;
+  border: none;
+  outline: none;
+
+  &:focus-within {
+    opacity: 1;
+  }
 }
 
 .highlight:hover .highlight__panel {
-  visibility: visible;
+  opacity: 1;
 }
 
 .highlight__panel-action {
@@ -67,6 +80,9 @@ div.highlight {
 
   &:hover {
     opacity: 1;
+  }
+  &:focus {
+    outline: none;
   }
 
   & + & {
