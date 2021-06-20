@@ -26,11 +26,20 @@ module CommentsHelper
     commentable.decorate.cached_tag_list_array.include?("ama") ? "Ask Me Anything" : "Author"
   end
 
-  def tree_for(comment, sub_comments, commentable)
-    nested_comments(tree: { comment => sub_comments }, commentable: commentable, is_view_root: true)
+  def tree_for(comment, sub_comments, commentable, current_user)
+    nested_comments(tree: { comment => sub_comments },
+                    commentable: commentable,
+                    is_view_root: true,
+                    current_user: current_user)
   end
 
-  def should_be_hidden?(comment, root_comment)
+  def should_be_hidden?(comment, root_comment, current_user)
+    commentable = comment.commentable
+    has_commentable_of_current_user = [commentable.user_id, commentable.co_author_ids].flatten.any?(current_user.id)
+    should_be_collapsed?(comment, root_comment) && !has_commentable_of_current_user
+  end
+
+  def should_be_collapsed?(comment, root_comment)
     comment.hidden_by_commentable_user && comment != root_comment
   end
 
@@ -63,11 +72,14 @@ module CommentsHelper
 
   private
 
-  def nested_comments(tree:, commentable:, is_view_root: false)
+  def nested_comments(tree:, commentable:, current_user:, is_view_root: false)
     comments = tree.map do |comment, sub_comments|
       render("comments/comment", comment: comment, commentable: commentable,
                                  is_view_root: is_view_root, is_childless: sub_comments.empty?,
-                                 subtree_html: nested_comments(tree: sub_comments, commentable: commentable))
+                                 subtree_html: nested_comments(tree: sub_comments,
+                                                               commentable: commentable,
+                                                               current_user: current_user),
+                                 current_user: current_user)
     end
 
     safe_join(comments)

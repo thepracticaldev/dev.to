@@ -183,6 +183,7 @@ function initializeCommentsPage() {
     }
   }
   listenForDetailsToggle();
+  hideCommentsHiddenByCommentableUser();
 }
 
 function toggleCodeOfConduct() {
@@ -535,25 +536,38 @@ function handleImageUpload(event, randomIdNumber) {
   }
 }
 
+function toggleItemSummaryHtml(item) {
+  var itemSummaryContent = item.getElementsByClassName("js-collapse-comment-content")[0];
+  var usernames = item.getElementsByClassName("js-comment-username");
+  var number = "";
+  if (usernames.length > 1) {
+    number = " + " + (usernames.length - 1) + " replies"
+  }
+  var itemUsername = usernames[0].textContent + number
+  if (item.open) {
+    itemSummaryContent.innerHTML = "";
+  } else {
+    itemSummaryContent.innerHTML = itemUsername;
+  }
+  item.getElementsByTagName("SUMMARY")[0].blur();
+}
+
 function listenForDetailsToggle() {
   var detailItems = document.querySelectorAll(".js-comment-wrapper");
   for (var i = 0; i < detailItems.length; i++) {
     detailItems[i].addEventListener("toggle", event => {
       var item = event.target;
-      var itemSummaryContent = item.getElementsByClassName("js-collapse-comment-content")[0];
-      var usernames = item.getElementsByClassName("js-comment-username");
-      var number = "";
-      if (usernames.length > 1) {
-        number = " + " + (usernames.length - 1) + " replies"
-      }
-      var itemUsername = usernames[0].textContent + number
-      if (item.open) {
-        itemSummaryContent.innerHTML = "";
-      } else {
-        itemSummaryContent.innerHTML = itemUsername;
-      }
-      item.getElementsByTagName("SUMMARY")[0].blur();
+      toggleItemSummaryHtml(item);
     });
+  }
+}
+
+function hideCommentsHiddenByCommentableUser() {
+  var hiddenCommentDetailItems = document.querySelectorAll(".js-comment-wrapper.hidden-by-commentable-user");
+  for (var i = 0; i < hiddenCommentDetailItems.length; i++) {
+    var item = hiddenCommentDetailItems[i];
+    item.open = false;
+    toggleItemSummaryHtml(item);
   }
 }
 
