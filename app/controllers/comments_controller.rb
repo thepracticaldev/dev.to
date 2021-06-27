@@ -293,8 +293,4 @@ class CommentsController < ApplicationController
       :comment_creation
     end
   end
-
-  def set_current_user
-    @current_user = current_user
-  end
 end
