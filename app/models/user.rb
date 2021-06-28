@@ -5,42 +5,10 @@ class User < ApplicationRecord
   include CloudinaryHelper
   include Storext.model
 
-  # @citizen428 Preparing to drop profile columns from the users table
-  PROFILE_COLUMNS = %w[
-    available_for
-    behance_url
-    bg_color_hex
-    currently_hacking_on
-    currently_learning
-    dribbble_url
-    education
-    email_public
-    employer_name
-    employer_url
-    employment_title
-    facebook_url
-    gitlab_url
-    instagram_url
-    linkedin_url
-    location
-    mastodon_url
-    medium_url
-    mostly_work_with
-    stackoverflow_url
-    summary
-    text_color_hex
-    twitch_url
-    twitch_username
-    website_url
-    youtube_url
-  ].freeze
-
-  self.ignored_columns = PROFILE_COLUMNS
-
-  # NOTE: @citizen428 This is temporary code during profile migration and will
-  # be removed.
-  concerning :ProfileMigration do
+  concerning :Profiles do
     included do
+      has_one :profile, dependent: :destroy
+
       # NOTE: There are rare cases were we want to skip this callback, primarily
       # in tests. `skip_callback` modifies global state, which is not thread-safe
       # and can cause hard to track down bugs. We use an instance-level attribute
@@ -49,19 +17,6 @@ class User < ApplicationRecord
 
       # All new users should automatically have a profile
       after_create_commit -> { Profile.create(user: self) }, unless: :_skip_creating_profile
-
-      # Getters and setters for unmapped profile attributes
-      (PROFILE_COLUMNS - Profile::MAPPED_ATTRIBUTES.values).each do |column|
-        delegate column, "#{column}=", to: :profile, allow_nil: true
-      end
-
-      # Getters and setters for mapped profile attributes
-      Profile::MAPPED_ATTRIBUTES.each do |profile_attribute, user_attribute|
-        define_method(user_attribute) { profile&.public_send(profile_attribute) }
-        define_method("#{user_attribute}=") do |value|
-          profile&.public_send("#{profile_attribute}=", value)
-        end
-      end
     end
   end
 
@@ -147,7 +102,6 @@ class User < ApplicationRecord
   acts_as_followable
   acts_as_follower
 
-  has_one :profile, dependent: :destroy
   has_one :notification_setting, class_name: "Users::NotificationSetting", dependent: :destroy
   has_one :setting, class_name: "Users::Setting", dependent: :destroy
 
