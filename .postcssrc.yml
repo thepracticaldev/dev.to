@@ -1,3 +1,3 @@
 plugins:
   postcss-smart-import: {}
-  postcss-cssnext: {}
+  postcss-preset-env: {}
