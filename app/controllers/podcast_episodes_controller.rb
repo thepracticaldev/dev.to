@@ -1,5 +1,6 @@
 class PodcastEpisodesController < ApplicationController
   # No authorization required for entirely public controller
+  before_action :set_current_user, only: %i[index]
   before_action :set_cache_control_headers, only: [:index]
 
   def index

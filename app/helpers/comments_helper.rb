@@ -34,9 +34,13 @@ module CommentsHelper
   end
 
   def should_be_hidden?(comment, root_comment, current_user)
+    return false unless should_be_collapsed?(comment, root_comment)
+
+    return true unless current_user
+
     commentable = comment.commentable
     has_commentable_of_current_user = [commentable.user_id, commentable.co_author_ids].flatten.any?(current_user&.id)
-    should_be_collapsed?(comment, root_comment) && !has_commentable_of_current_user
+    !has_commentable_of_current_user
   end
 
   def should_be_collapsed?(comment, root_comment)
