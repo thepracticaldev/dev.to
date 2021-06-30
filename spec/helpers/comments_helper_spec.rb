@@ -50,11 +50,45 @@ describe CommentsHelper, type: :helper do
       it "is not hidden when commentable of current_user present" do
         expect(helper.should_be_hidden?(comment, root_comment, current_user)).to be false
       end
+    end
 
-      it "is hidden when commentable of a different user than current_user" do
+    context "when is collapsed and is for commentable of a different user than current user" do
+      before do
         article.update(user: other_user)
+      end
+
+      it "is hidden" do
         expect(helper.should_be_hidden?(comment, root_comment, current_user)).to be true
-        article.update(user: current_user)
+      end
+    end
+  end
+
+  describe "#tree_for" do
+    context "when comment is hidden by commentable user" do
+      it "returns blank when no current_user" do
+        expect(helper.tree_for(comment, [], article, nil)).to be_empty
+      end
+
+      it "returns blank when current_user is not the commentable user" do
+        expect(helper.tree_for(comment, [], article, other_user)).to be_empty
+      end
+
+      it "is not empty when current_user is the commentable user but has hidden-by-commentable-user class" do
+        comment_tree = helper.tree_for(comment, [], article, current_user)
+        expect(comment_tree).not_to be_empty
+        expect(comment_tree).to include("hidden-by-commentable-user")
+      end
+    end
+
+    context "when comment not hidden by commentable user" do
+      before do
+        comment.update(hidden_by_commentable_user: false)
+      end
+
+      it "is not empty" do
+        comment_tree = helper.tree_for(comment, [], article, current_user)
+        expect(comment_tree).not_to be_empty
+        expect(comment_tree).to exclude("hidden-by-commentable-user")
       end
     end
   end
