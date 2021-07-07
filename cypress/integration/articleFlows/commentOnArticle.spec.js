@@ -35,7 +35,7 @@ describe('Comment on articles', () => {
           content: `This is a test article's contents.`,
           published: true,
         }).then((response) => {
-          cy.visit(response.body.current_state_path);
+          cy.visitAndWaitForUserSideEffects(response.body.current_state_path);
         });
       });
     });
@@ -415,6 +415,21 @@ describe('Comment on articles', () => {
 
       cy.findByText(/^this is a comment$/i);
       cy.findByRole('heading', { name: 'Discussion (1)' });
+
+      // Check that the profile preview card is there and can be displayed
+      cy.findByTestId('comments-container').within(() => {
+        // Wait for the dropdown to initialize
+        cy.get('button[id^=comment-profile-preview-trigger][data-initialized]');
+
+        cy.findByRole('button', {
+          name: 'Article Editor v1 User profile details',
+        }).click();
+
+        cy.findByTestId('profile-preview-card').within(() => {
+          cy.findByRole('button', { name: 'Edit profile' });
+          cy.findByRole('link', { name: 'Article Editor v1 User' });
+        });
+      });
     });
   });
 
@@ -499,6 +514,21 @@ describe('Comment on articles', () => {
 
     cy.findByTestId('modal-container').should('not.exist');
     cy.findByRole('button', { name: /^Submit$/i }).should('have.focus');
+  });
+
+  it('should add a comment with a gist embed', () => {
+    cy.findByRole('main').within(() => {
+      cy.findByRole('textbox', {
+        name: /^Add a comment to the discussion$/i,
+      }).type(
+        'Here is a gist: {% gist https://gist.github.com/CristinaSolana/1885435.js %}',
+        { parseSpecialCharSequences: false },
+      );
+
+      cy.findByRole('button', { name: /^Submit$/i }).click();
+    });
+    cy.get('#gist1885435').should('be.visible');
+    cy.findByRole('link', { name: 'view raw' });
   });
 
   it('should provide a dropdown of options', () => {
