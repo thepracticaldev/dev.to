@@ -73,7 +73,7 @@ class User < ApplicationRecord
   NAVBARS = %w[default static].freeze
   THEMES = %w[default night_theme pink_theme minimal_light_theme ten_x_hacker_theme].freeze
   USERNAME_MAX_LENGTH = 30
-  USERNAME_REGEXP = /\A[a-zA-Z0-9_]+\z/.freeze
+  USERNAME_REGEXP = /\A[a-zA-Z0-9_]+\z/
   MESSAGES = {
     invalid_config_font: "%<value>s is not a valid font selection",
     invalid_config_navbar: "%<value>s is not a valid navbar value",
@@ -88,7 +88,7 @@ class User < ApplicationRecord
     ([a-zA-Z0-9\-.])+ # matches the hostname (ex ilp.uphold.com)
     (/[\x20-\x7F]+)?  # optional forward slash and identifier with printable ASCII characters
     \z
-  }x.freeze
+  }x
 
   # Relevant Fields for migration from Users table to Users_Settings table
   USER_FIELDS_TO_MIGRATE_TO_USERS_SETTINGS_TABLE = %w[
