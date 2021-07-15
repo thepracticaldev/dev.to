@@ -20,7 +20,8 @@ class UserPolicy < ApplicationPolicy
     email_follower_notifications
     email_membership_newsletter
     email_mention_notifications
-    email_newsletter email_public
+    email_newsletter
+    email_public
     email_tag_mod_newsletter
     email_unread_notifications
     employer_name
@@ -37,7 +38,6 @@ class UserPolicy < ApplicationPolicy
     mobile_comment_notifications
     mod_roundrobin_notifications
     welcome_notifications
-    mostly_work_with
     name
     password
     password_confirmation

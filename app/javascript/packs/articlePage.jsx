@@ -50,8 +50,8 @@ if (shareDropdownButton.dataset.initialized !== 'true') {
       .querySelectorAll('#article-show-more-dropdown [href]')
       .forEach((link) => {
         link.addEventListener('click', (event) => {
-          closeDropdown(event)
-          
+          closeDropdown(event);
+
           // Temporary Ahoy Stats for usage reports
           ahoy.track('Post Dropdown', { option: event.target.text.trim() });
         });

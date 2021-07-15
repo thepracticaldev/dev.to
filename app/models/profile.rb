@@ -15,20 +15,7 @@ class Profile < ApplicationRecord
   # any profile on a given Forem.
   STATIC_FIELDS = %w[summary location website_url].freeze
 
-  SPECIAL_DISPLAY_ATTRIBUTES = %w[
-    summary
-    employment_title
-    employer_name
-    employer_url
-    location
-  ].freeze
-
-  # NOTE: @citizen428 This is a temporary mapping so we don't break DEV during
-  # profile migration/generalization work.
-  MAPPED_ATTRIBUTES = {
-    education: :education,
-    skills_languages: :mostly_work_with
-  }.with_indifferent_access.freeze
+  SPECIAL_DISPLAY_ATTRIBUTES = %w[summary location].freeze
 
   # Generates typed accessors for all currently defined profile fields.
   def self.refresh_attributes!
@@ -40,7 +27,7 @@ class Profile < ApplicationRecord
       # TODO: [@jacobherrington] Remove this when ProfileFields for the static
       # fields are dropped from production and the associated data is removed.
       # https://github.com/forem/forem/pull/13641#discussion_r637641185
-      next if STATIC_FIELDS.any?(field.attribute_name)
+      next if field.attribute_name.in?(STATIC_FIELDS)
 
       store_attribute :data, field.attribute_name.to_sym, field.type
     end

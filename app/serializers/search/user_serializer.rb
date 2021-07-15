@@ -10,7 +10,6 @@ module Search
                :employer_name,
                :hotness_score,
                :last_comment_at,
-               :mostly_work_with,
                :name,
                :path,
                :public_reactions_count,
