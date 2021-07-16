@@ -183,9 +183,14 @@ function initializePodcastPlayback() {
     Array.prototype.forEach.call(records, function (record) {
       var episodeSlug = record.getAttribute('data-episode');
       var podcastSlug = record.getAttribute('data-podcast');
-      record.onclick = function () {
+
+      var togglePodcastState = function (e) {
+        var isPressed = record.getAttribute('aria-pressed') === 'true';
+        e.preventDefault();
         if (podcastBarAlreadyExistAndPlayingTargetEpisode(episodeSlug)) {
           var audio = getById('audio');
+          record.setAttribute('aria-pressed', !isPressed);
+
           if (audio) {
             playPause(audio);
           }
@@ -194,6 +199,7 @@ function initializePodcastPlayback() {
           loadAndPlayNewPodcast(episodeSlug);
         }
       };
+      record.addEventListener('click', togglePodcastState);
     });
   }
 
