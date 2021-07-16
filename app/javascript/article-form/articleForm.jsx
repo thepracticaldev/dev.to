@@ -97,7 +97,7 @@ export class ArticleForm extends Component {
     this.state = {
       formKey: new Date().toISOString(),
       id: this.article.id || null, // eslint-disable-line react/no-unused-state
-      title: this.article.title || '',
+      title: this.article.decoded_title || '',
       tagList: this.article.cached_tag_list || '',
       description: '', // eslint-disable-line react/no-unused-state
       canonicalUrl: this.article.canonical_url || '', // eslint-disable-line react/no-unused-state
@@ -265,7 +265,11 @@ export class ArticleForm extends Component {
     this.setState({ submitting: true, published: true });
     const { state } = this;
     state.published = true;
-    submitArticle(state, this.removeLocalStorage, this.handleArticleError);
+    submitArticle(
+      { ...state, title: filterXSS(state.title) },
+      this.removeLocalStorage,
+      this.handleArticleError,
+    );
   };
 
   onSaveDraft = (e) => {
@@ -289,7 +293,7 @@ export class ArticleForm extends Component {
       // This permits us to reset the defaultValue for the MentionAutcompleteTextArea component without having to change
       // MentionAutcompleteTextArea component's implementation.
       formKey: new Date().toISOString(),
-      title: this.article.title || '',
+      title: this.article.decoded_title || '',
       tagList: this.article.cached_tag_list || '',
       description: '', // eslint-disable-line react/no-unused-state
       canonicalUrl: this.article.canonical_url || '', // eslint-disable-line react/no-unused-state
