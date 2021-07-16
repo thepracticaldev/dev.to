@@ -15,7 +15,6 @@ class RegistrationsController < Devise::RegistrationsController
     authorize(params, policy_class: RegistrationPolicy)
 
     resolve_profile_field_issues
-
     unless recaptcha_verified?
       flash[:notice] = "You must complete the recaptcha ✅"
       return redirect_to new_user_registration_path(state: "email_signup")
@@ -82,6 +81,9 @@ class RegistrationsController < Devise::RegistrationsController
     resource.registered_at = Time.current
     resource.build_setting(editor_version: "v2")
     resource.remote_profile_image_url = Users::ProfileImageGenerator.call if resource.remote_profile_image_url.blank?
+    if FeatureFlag.enabled?(:creator_onboarding)
+      resource.password_confirmation = resource.password
+    end
     check_allowed_email(resource) if resource.email.present?
     resource.save if resource.email.present?
   end
