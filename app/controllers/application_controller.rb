@@ -203,6 +203,10 @@ class ApplicationController < ActionController::Base
     Settings::General.admin_action_taken_at = Time.current # Used as cache key
   end
 
+  def set_current_user
+    @current_user = current_user
+  end
+
   protected
 
   def configure_permitted_parameters

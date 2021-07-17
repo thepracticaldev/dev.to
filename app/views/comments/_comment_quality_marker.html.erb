@@ -7,6 +7,10 @@
 <% if comment.hidden_by_commentable_user %>
   <div class="low-quality-comment-marker comment__quality-marker">
     <%= inline_svg_tag("info.svg", aria: true, class: "crayons-icon mr-2", title: "Info") %>
-    Comment hidden by post author - thread only visible in this permalink
+    <% if @root_comment %>
+      Comment hidden by post author - thread only visible in this permalink
+    <% else %>
+      Comment hidden by post author - thread only accessible via permalink
+    <% end %>
   </div>
 <% end %>

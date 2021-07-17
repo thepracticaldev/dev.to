@@ -1,5 +1,6 @@
 class CommentsController < ApplicationController
   before_action :set_comment, only: %i[update destroy]
+  before_action :set_current_user, only: %i[index]
   before_action :set_cache_control_headers, only: [:index]
   before_action :authenticate_user!, only: %i[preview create hide unhide]
   after_action :verify_authorized

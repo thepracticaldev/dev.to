@@ -17,6 +17,7 @@ class StoriesController < ApplicationController
   SIGNED_OUT_RECORD_COUNT = 60
 
   before_action :authenticate_user!, except: %i[index search show]
+  before_action :set_current_user, only: %i[show]
   before_action :set_cache_control_headers, only: %i[index search show]
   before_action :redirect_to_lowercase_username, only: %i[index]
 

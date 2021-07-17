@@ -27,7 +27,7 @@
           <% if @article.comments_count > 0 %>
             <% Comment.tree_for(@article, @comments_to_show_count).each do |comment, sub_comments| %>
               <% cache ["comment_root_cached_tree", comment] do %>
-                <%= tree_for(comment, sub_comments, @article) %>
+                <%= tree_for(comment, sub_comments, @article, @current_user) %>
               <% end %>
             <% end %>
           <% end %>
