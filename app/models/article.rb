@@ -27,6 +27,7 @@ class Article < ApplicationRecord
 
   # The date that we began limiting the number of user mentions in an article.
   MAX_USER_MENTION_LIVE_AT = Time.utc(2021, 4, 7).freeze
+  IMG_MARKDOWN_REGEX = %r{!\[.*\]\(#{ApplicationConfig["APP_PROTOCOL"]}#{ApplicationConfig["AWS_BUCKET_NAME"]}.s3.amazonaws.com/#{ArticleImageUploader.new.store_dir}(.*)\)}.freeze # rubocop:disable Layout/LineLength
 
   has_one :discussion_lock, dependent: :destroy
 
@@ -105,6 +106,7 @@ class Article < ApplicationRecord
   after_update_commit :update_notifications, if: proc { |article|
                                                    article.notifications.any? && !article.saved_changes.empty?
                                                  }
+  after_destroy_commit :delete_images
 
   after_commit :async_score_calc, :touch_collection, :detect_animated_images, on: %i[create update]
 
@@ -826,5 +828,14 @@ class Article < ApplicationRecord
     return unless saved_change_to_attribute?(:processed_html)
 
     ::Articles::DetectAnimatedImagesWorker.perform_async(id)
+  end
+
+  def delete_images
+    image_paths = body_markdown.scan(IMG_MARKDOWN_REGEX).flatten
+    main_image_path = main_image&.scan(IMG_MARKDOWN_REGEX)
+    image_paths << main_image_path if main_image_path
+    image_paths.each do |image_path|
+      Images::DeleteWorker.perform_async(image_path)
+    end
   end
 end
