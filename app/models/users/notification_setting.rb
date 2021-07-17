@@ -4,8 +4,6 @@ module Users
 
     belongs_to :user, touch: true
 
-    validates :email_digest_periodic, inclusion: { in: [true, false] }
-
     alias_attribute :subscribed_to_welcome_notifications?, :welcome_notifications
     alias_attribute :subscribed_to_mod_roundrobin_notifications?, :mod_roundrobin_notifications
     alias_attribute :subscribed_to_email_follower_notifications?, :email_follower_notifications
@@ -13,7 +11,9 @@ module Users
     after_commit :subscribe_to_mailchimp_newsletter
 
     def subscribe_to_mailchimp_newsletter
-      return unless email_newsletter
+      return if Settings::General.mailchimp_api_key.blank?
+      return unless saved_changes.key?(:email_newsletter)
+      return if user.email.blank?
 
       Users::SubscribeToMailchimpNewsletterWorker.perform_async(user.id)
     end
